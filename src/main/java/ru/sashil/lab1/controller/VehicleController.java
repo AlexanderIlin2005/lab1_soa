@@ -23,15 +23,15 @@ import ru.sashil.lab1.specification.VehicleSpecification;
 import org.springframework.data.domain.Sort;
 
 @RestController
-@RequestMapping("/api/vehicles") // Базовый URL для первого сервиса
+@RequestMapping("/api/vehicles") 
 public class VehicleController {
 
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    // 1. Получение массива элементов (с пагинацией, сортировкой, фильтрацией)
-    // Примечание: Полная фильтрация по всем полям требует Specification,
-    // для простоты здесь показана пагинация. Для полной фильтрации используйте JpaSpecificationExecutor.
+    
+    
+    
     @GetMapping
     @Operation(summary = "Get all vehicles with filtering, sorting and pagination")
     public Page<Vehicle> getAllVehicles(
@@ -47,7 +47,7 @@ public class VehicleController {
             @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
-        // 1. Сборка фильтра
+        
         VehicleFilter filter = new VehicleFilter();
         filter.setName(name);
         filter.setX(x);
@@ -57,19 +57,19 @@ public class VehicleController {
         filter.setType(type);
         filter.setFuelType(fuelType);
 
-        // 2. Настройка сортировки
+        
         Sort sort = Sort.unsorted();
         if (sortBy != null && !sortBy.isEmpty()) {
             Sort.Direction dir = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
             sort = Sort.by(dir, sortBy);
         }
 
-        // 3. Выполнение запроса
+        
         Specification<Vehicle> spec = VehicleSpecification.withFilter(filter);
         return vehicleRepository.findAll(spec, PageRequest.of(page, size, sort));
     }
 
-    // 2. Получение элемента по ID
+    
     @GetMapping("/{id}")
     @Operation(summary = "Get vehicle by ID")
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long id) {
@@ -77,30 +77,30 @@ public class VehicleController {
         return vehicle.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // 3. Добавление нового элемента
+    
     @PostMapping
     @Operation(summary = "Add new vehicle")
     public ResponseEntity<Vehicle> addVehicle(@RequestBody Vehicle vehicle) {
-        // Валидация и установка автополей
+        
         if (vehicle.getName() == null || vehicle.getName().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         if (vehicle.getEnginePower() <= 0 || vehicle.getNumberOfWheels() <= 0) {
             return ResponseEntity.badRequest().build();
         }
-        // Coordinates validation
+        
         if (vehicle.getCoordinates() != null && vehicle.getCoordinates().getY() > 719) {
             return ResponseEntity.badRequest().build();
         }
 
-        vehicle.setId(null); // ID генерируется автоматически
-        vehicle.setCreationDate(LocalDate.now()); // Дата генерируется автоматически
+        vehicle.setId(null); 
+        vehicle.setCreationDate(LocalDate.now()); 
 
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
         return ResponseEntity.ok(savedVehicle);
     }
 
-    // 4. Обновление элемента
+    
     @PutMapping("/{id}")
     @Operation(summary = "Update vehicle")
     public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @RequestBody Vehicle vehicleDetails) {
@@ -110,7 +110,7 @@ public class VehicleController {
         }
 
         Vehicle vehicle = optionalVehicle.get();
-        // Обновляем поля, кроме ID и CreationDate (обычно)
+        
         vehicle.setName(vehicleDetails.getName());
         vehicle.setCoordinates(vehicleDetails.getCoordinates());
         vehicle.setEnginePower(vehicleDetails.getEnginePower());
@@ -118,13 +118,13 @@ public class VehicleController {
         vehicle.setType(vehicleDetails.getType());
         vehicle.setFuelType(vehicleDetails.getFuelType());
 
-        // Валидация при обновлении тоже нужна
+        
         if (vehicle.getEnginePower() <= 0) return ResponseEntity.badRequest().build();
 
         return ResponseEntity.ok(vehicleRepository.save(vehicle));
     }
 
-    // 5. Удаление элемента
+    
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete vehicle")
     public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
@@ -135,9 +135,9 @@ public class VehicleController {
         return ResponseEntity.noContent().build();
     }
 
-    // --- Дополнительные операции ---
+    
 
-    // 6. Рассчитать среднее значение enginePower
+    
     @GetMapping("/stats/average-engine-power")
     @Operation(summary = "Get average engine power")
     public ResponseEntity<Double> getAverageEnginePower() {
@@ -152,7 +152,7 @@ public class VehicleController {
         return ResponseEntity.ok(avg);
     }
 
-    // 7. Вернуть количество объектов, enginePower которых меньше заданного
+    
     @GetMapping("/stats/count-by-engine-power-less-than")
     @Operation(summary = "Count vehicles with engine power less than specified")
     public ResponseEntity<Long> countByEnginePowerLessThan(@RequestParam int power) {
@@ -162,7 +162,7 @@ public class VehicleController {
         return ResponseEntity.ok(count);
     }
 
-    // 8. Вернуть массив объектов, name которых содержит подстроку
+    
     @GetMapping("/search/by-name")
     @Operation(summary = "Search vehicles by name substring")
     public ResponseEntity<List<Vehicle>> searchByName(@RequestParam String substring) {

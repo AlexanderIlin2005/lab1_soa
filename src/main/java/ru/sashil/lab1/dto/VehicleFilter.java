@@ -8,7 +8,7 @@ import ru.sashil.lab1.model.VehicleType;
 public class VehicleFilter {
     private String name;
     private Long x;
-    private Long y; // В задании y - long, но для фильтрации удобнее Long
+    private Long y; 
     private Integer minEnginePower;
     private Integer maxEnginePower;
     private Integer minNumberOfWheels;

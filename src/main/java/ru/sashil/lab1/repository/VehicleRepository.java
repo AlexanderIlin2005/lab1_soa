@@ -13,9 +13,9 @@ import java.util.List;
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpecificationExecutor<Vehicle> {
 
-    // Для операции: Вернуть массив объектов, значение поля name которых содержит заданную подстроку
+    
     List<Vehicle> findByNameContainingIgnoreCase(String substring);
 
-    // Для операции: Найти все транспортные средства заданного типа (для второго сервиса)
+    
     List<Vehicle> findByType(VehicleType type);
 }

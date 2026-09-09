@@ -30,7 +30,7 @@ public class Vehicle {
     @Min(value = 1, message = "Number of wheels must be > 0")
     private int numberOfWheels;
 
-    // ВАЖНО: Явно указываем EnumType.STRING
+    
     @Enumerated(EnumType.STRING)
     private VehicleType type;
 

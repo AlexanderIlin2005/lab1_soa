@@ -25,10 +25,10 @@ public class ShopController {
         return ResponseEntity.ok(vehicles);
     }
 
-    // Внимание: URL в задании /add-wheels/{vehicle-id}/number-of-wheels
-    // Мы интерпретируем это так, что number-of-wheels - это часть пути, а само значение колес передается в body или param.
-    // Но более логично, что {number-of-wheels} - это плейсхолдер для значения.
-    // Давайте сделаем так, как чаще всего понимают такие задания: значение в пути.
+    
+    
+    
+    
 
     @PostMapping("/add-wheels/{id}/{wheelsAmount}")
     @Operation(summary = "Add wheels to vehicle")
@@ -41,9 +41,9 @@ public class ShopController {
         Vehicle vehicle = optionalVehicle.get();
         vehicle.setNumberOfWheels(vehicle.getNumberOfWheels() + wheelsAmount);
 
-        // Валидация после изменения
+        
         if (vehicle.getNumberOfWheels() <= 0) {
-            return ResponseEntity.badRequest().body(vehicle); // Или ошибку
+            return ResponseEntity.badRequest().body(vehicle); 
         }
 
         return ResponseEntity.ok(vehicleRepository.save(vehicle));
