@@ -8,11 +8,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.sashil.lab1.model.Vehicle;
+import ru.sashil.lab1.model.FuelType;
+import ru.sashil.lab1.model.VehicleType;
 import ru.sashil.lab1.repository.VehicleRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import ru.sashil.lab1.dto.VehicleFilter;
+
+import org.springframework.data.jpa.domain.Specification;
+import ru.sashil.lab1.specification.VehicleSpecification;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/api/vehicles") // Базовый URL для первого сервиса
@@ -25,16 +33,40 @@ public class VehicleController {
     // Примечание: Полная фильтрация по всем полям требует Specification,
     // для простоты здесь показана пагинация. Для полной фильтрации используйте JpaSpecificationExecutor.
     @GetMapping
-    @Operation(summary = "Get all vehicles with pagination and sorting")
+    @Operation(summary = "Get all vehicles with filtering, sorting and pagination")
     public Page<Vehicle> getAllVehicles(
-            @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Sort field") @RequestParam(required = false) String sortBy,
-            @Parameter(description = "Sort direction (asc/desc)") @RequestParam(defaultValue = "asc") String direction) {
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Long x,
+            @RequestParam(required = false) Long y,
+            @RequestParam(required = false) Integer minEnginePower,
+            @RequestParam(required = false) Integer maxEnginePower,
+            @RequestParam(required = false) VehicleType type,
+            @RequestParam(required = false) FuelType fuelType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
 
-        // Реализация сортировки и пагинации
-        // PageRequest.of(page, size, Sort.by(direction.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy));
-        return vehicleRepository.findAll(PageRequest.of(page, size));
+        // 1. Сборка фильтра
+        VehicleFilter filter = new VehicleFilter();
+        filter.setName(name);
+        filter.setX(x);
+        filter.setY(y);
+        filter.setMinEnginePower(minEnginePower);
+        filter.setMaxEnginePower(maxEnginePower);
+        filter.setType(type);
+        filter.setFuelType(fuelType);
+
+        // 2. Настройка сортировки
+        Sort sort = Sort.unsorted();
+        if (sortBy != null && !sortBy.isEmpty()) {
+            Sort.Direction dir = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+            sort = Sort.by(dir, sortBy);
+        }
+
+        // 3. Выполнение запроса
+        Specification<Vehicle> spec = VehicleSpecification.withFilter(filter);
+        return vehicleRepository.findAll(spec, PageRequest.of(page, size, sort));
     }
 
     // 2. Получение элемента по ID

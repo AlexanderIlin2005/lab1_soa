@@ -1,6 +1,9 @@
 package ru.sashil.lab1.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.time.LocalDate;
 
@@ -12,24 +15,22 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Name cannot be empty or null")
     private String name;
 
+    @NotNull(message = "Coordinates cannot be null")
     @Embedded
     private Coordinates coordinates;
 
-    @Column(nullable = false)
+    // CreationDate генерируется автоматически, при вводе его можно игнорировать или не принимать
     private LocalDate creationDate;
 
-    @Column(name = "engine_power", nullable = false)
+    @Min(value = 1, message = "Engine power must be > 0")
     private int enginePower;
 
-    @Column(name = "number_of_wheels", nullable = false)
+    @Min(value = 1, message = "Number of wheels must be > 0")
     private int numberOfWheels;
 
-    @Enumerated(EnumType.STRING)
     private VehicleType type;
-
-    @Enumerated(EnumType.STRING)
     private FuelType fuelType;
 }

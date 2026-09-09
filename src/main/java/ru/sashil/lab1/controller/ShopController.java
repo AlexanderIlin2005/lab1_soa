@@ -12,13 +12,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/shop") // URL второго сервиса
+@RequestMapping("/shop")
 public class ShopController {
 
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    // 1. Найти все ТС заданного типа
     @GetMapping("/search/by-type/{type}")
     @Operation(summary = "Find vehicles by type")
     public ResponseEntity<List<Vehicle>> getByType(@PathVariable VehicleType type) {
@@ -26,29 +25,25 @@ public class ShopController {
         return ResponseEntity.ok(vehicles);
     }
 
-    // 2. Добавить колёса
-    // URL: /add-wheels/{vehicle-id}/number-of-wheels
-    // Внимание: в задании URL указан как /add-wheels/{vehicle-id}/number-of-wheels
-    // Но обычно число колес передают как параметр или в теле.
-    // Исходя из формулировки "добавить ... указанное число колёс", предположим, что число колес - это часть пути или query param.
-    // В задании написано: /add-wheels/{vehicle-id}/number-of-wheels. Это странно, так как number-of-wheels выглядит как статическая строка.
-    // Скорее всего, имелось в виду: /add-wheels/{vehicle-id}/{wheelsToAdd} или wheelsToAdd в query.
-    // Давайте сделаем так: /add-wheels/{id}/{amount}
+    // Внимание: URL в задании /add-wheels/{vehicle-id}/number-of-wheels
+    // Мы интерпретируем это так, что number-of-wheels - это часть пути, а само значение колес передается в body или param.
+    // Но более логично, что {number-of-wheels} - это плейсхолдер для значения.
+    // Давайте сделаем так, как чаще всего понимают такие задания: значение в пути.
 
-    @PostMapping("/add-wheels/{id}/{amount}")
+    @PostMapping("/add-wheels/{id}/{wheelsAmount}")
     @Operation(summary = "Add wheels to vehicle")
-    public ResponseEntity<Vehicle> addWheels(@PathVariable Long id, @PathVariable int amount) {
+    public ResponseEntity<Vehicle> addWheels(@PathVariable Long id, @PathVariable int wheelsAmount) {
         Optional<Vehicle> optionalVehicle = vehicleRepository.findById(id);
         if (optionalVehicle.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         Vehicle vehicle = optionalVehicle.get();
-        vehicle.setNumberOfWheels(vehicle.getNumberOfWheels() + amount);
+        vehicle.setNumberOfWheels(vehicle.getNumberOfWheels() + wheelsAmount);
 
-        // Проверка на положительность после сложения
+        // Валидация после изменения
         if (vehicle.getNumberOfWheels() <= 0) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(vehicle); // Или ошибку
         }
 
         return ResponseEntity.ok(vehicleRepository.save(vehicle));
