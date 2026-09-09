@@ -22,7 +22,6 @@ public class Vehicle {
     @Embedded
     private Coordinates coordinates;
 
-    // CreationDate генерируется автоматически, при вводе его можно игнорировать или не принимать
     private LocalDate creationDate;
 
     @Min(value = 1, message = "Engine power must be > 0")
@@ -31,6 +30,10 @@ public class Vehicle {
     @Min(value = 1, message = "Number of wheels must be > 0")
     private int numberOfWheels;
 
+    // ВАЖНО: Явно указываем EnumType.STRING
+    @Enumerated(EnumType.STRING)
     private VehicleType type;
+
+    @Enumerated(EnumType.STRING)
     private FuelType fuelType;
 }
