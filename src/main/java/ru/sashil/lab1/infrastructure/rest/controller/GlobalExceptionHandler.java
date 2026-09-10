@@ -1,4 +1,4 @@
-package ru.sashil.lab1.controller;
+package ru.sashil.lab1.infrastructure.rest.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
