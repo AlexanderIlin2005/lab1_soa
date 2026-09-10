@@ -1,25 +1,24 @@
-package ru.sashil.lab1.controller;
+package ru.sashil.lab1.infrastructure.rest.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.sashil.lab1.model.Vehicle;
-import ru.sashil.lab1.model.FuelType;
-import ru.sashil.lab1.model.VehicleType;
-import ru.sashil.lab1.repository.VehicleRepository;
+import ru.sashil.lab1.application.repository.VehicleRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import ru.sashil.lab1.dto.VehicleFilter;
+import ru.sashil.lab1.domain.model.FuelType;
+import ru.sashil.lab1.domain.model.Vehicle;
+import ru.sashil.lab1.domain.model.VehicleType;
+import ru.sashil.lab1.infrastructure.rest.dto.VehicleFilter;
 
 import org.springframework.data.jpa.domain.Specification;
-import ru.sashil.lab1.specification.VehicleSpecification;
+import ru.sashil.lab1.infrastructure.rest.specification.VehicleSpecification;
 import org.springframework.data.domain.Sort;
 
 @RestController
@@ -28,9 +27,6 @@ public class VehicleController {
 
     @Autowired
     private VehicleRepository vehicleRepository;
-
-    
-    
     
     @GetMapping
     @Operation(summary = "Get all vehicles with filtering, sorting and pagination")
@@ -40,24 +36,26 @@ public class VehicleController {
             @RequestParam(required = false) Long y,
             @RequestParam(required = false) Integer minEnginePower,
             @RequestParam(required = false) Integer maxEnginePower,
-            @RequestParam(required = false) VehicleType type,
+            @RequestParam(required = false) Integer minNumberOfWheels,
+            @RequestParam(required = false) VehicleType vehicleType,
             @RequestParam(required = false) FuelType fuelType,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
-        
-        VehicleFilter filter = new VehicleFilter();
-        filter.setName(name);
-        filter.setX(x);
-        filter.setY(y);
-        filter.setMinEnginePower(minEnginePower);
-        filter.setMaxEnginePower(maxEnginePower);
-        filter.setType(type);
-        filter.setFuelType(fuelType);
 
-        
+        VehicleFilter filter = new VehicleFilter(
+                name,
+                x,
+                y,
+                minEnginePower,
+                maxEnginePower,
+                minNumberOfWheels,
+                vehicleType,
+                fuelType
+        );
+
         Sort sort = Sort.unsorted();
         if (sortBy != null && !sortBy.isEmpty()) {
             Sort.Direction dir = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;

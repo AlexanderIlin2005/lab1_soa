@@ -1,4 +1,4 @@
-package ru.sashil;
+package ru.sashil.lab1;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
